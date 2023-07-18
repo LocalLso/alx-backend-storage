@@ -1,26 +1,23 @@
 #!/usr/bin/env python3
-"""Log stats"""
+"""
+Log stats
+"""
 from pymongo import MongoClient
 
-
-def helper(a: dict) -> int:
-    """return log"""
-    client = MongoClient('mongodb://127.0.0.1:27017')
-    logs = client.logs.nginx
-    return logs.count_documents(a)
-
-
-def main():
-    """ provides some stats about Nginx logs stored in MongoDB """
-    print(f"{helper({})} logs")
-    print("Methods:")
-    print(f"\tmethod GET: {helper({'method': 'GET'})}")
-    print(f"\tmethod POST: {helper({'method': 'POST'})}")
-    print(f"\tmethod PUT: {helper({'method': 'PUT'})}")
-    print(f"\tmethod PATCH: {helper({'method': 'PATCH'})}")
-    print(f"\tmethod DELETE: {helper({'method': 'DELETE'})}")
-    print(f"{helper({'method': 'GET', 'path': '/status'})} status check")
-
-
 if __name__ == "__main__":
-    main()
+    client = MongoClient("mongodb://127.0.01:27017")
+    nginx_collection = client.logs.nginx
+
+    methods = ["GET", "POST", "PUT", "PATCH", "DELETE"]
+    path = "path"
+    status = "/status"
+
+    print(f"{nginx_collection.count_documents({})} logs")
+    print("Methods:")
+
+    for value in methods:
+        count = nginx_collection.count_documents({"method": value})
+        print(f"\tmethod {value}: {count}")
+    print(f"{nginx_collection.count_documents({path: status})} status check")
+    print("IPs:")
+    print(nginx_collection.count_documents({"ip": {"$regex": "^[0-9]"}}))
